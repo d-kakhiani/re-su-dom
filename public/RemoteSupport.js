@@ -12,6 +12,10 @@ class RemoteSupport {
     }
   }
 
+  closeConnection(message) {
+    this._connection.close();
+  }
+
   setupSocketListeners() {
     if (!this.ws) {
       console.warn('Please setup websocket');
@@ -28,6 +32,13 @@ class RemoteSupport {
 
   socketCloseHandler() {
     // handler socket state change
+    window.alert(
+        'Something wen wrong, your connection closed, please refresh the page');
+    // location.reload();
+  }
+
+  errorHandler(message) {
+    window.alert(message);
   }
 
   socketMessageHandler(event) {
@@ -54,6 +65,12 @@ class RemoteSupport {
       case 'register-offer':
         this.createAndSendOfferDescription(event.detail);
         break;
+      case 'error':
+        this.errorHandler(event.detail.message);
+        break;
+      case 'close':
+        this.closeConnection(event.detail);
+        break;
     }
   }
 
@@ -73,22 +90,9 @@ class RemoteSupport {
 
   get createMediaStream() {
     const mediaStream = this.getMediaStream;
-    if (!this._connection) {
-      console.error('Please setup RTCPeerConnection at first');
-      return;
-    }
     return mediaStream.then((stream) => {
-      for (const track of stream.getTracks()) {
-        track.addEventListener('ended', this._streamTrackEndHandler.bind(this));
-      }
       return stream.getTracks();
-    }).catch(() => {
-
     });
-  }
-
-  _streamTrackEndHandler(event) {
-
   }
 
   // this fires when support initiate call
@@ -98,16 +102,20 @@ class RemoteSupport {
       console.error('Invalid offer message format');
       return;
     }
-    if (!this._connection) {
-      // it means its must be initiated from someone
-      this.createConnection(message.toUser);
-    }
+
     this.createMediaStream.then((tracks) => {
+      if (!this._connection) {
+        // it means its must be initiated from someone
+        this.createConnection(message.toUser);
+      }
       this._connection.addTrack(tracks);
       this._connection.createOffer();
-
-    }).catch(() => {
-
+    }).catch((error) => {
+      this.ws.send({
+        type: 'error',
+        message: `Error during createStream, message: ${error.message}`,
+        toUser: message.toUser,
+      });
     });
   }
 
@@ -186,7 +194,6 @@ class RTCConnectionClass {
   }
 
   trackHandler(event) {
-    console.debug('Remote stream successfully added', event.streams);
     if (event.streams && event.streams[0]) {
       this.streamIntoElement.srcObject = event.streams[0];
     } else {
@@ -207,7 +214,7 @@ class RTCConnectionClass {
     video.setAttribute('playsinline', '');
     video.setAttribute('autoplay', '');
     video.setAttribute('muted', '');
-    video.style.width = '240px';
+    video.style.width = '100vw';
     return video;
   }
 
@@ -240,8 +247,18 @@ class RTCConnectionClass {
 
   addTrack(tracks) {
     for (const track of tracks) {
+      track.addEventListener('ended', this._trackEndHandler.bind(this));
       this.peerConnection.addTrack(track);
     }
+  }
+
+  _trackEndHandler() {
+    this.close();
+    this.ws.send({
+      type: 'close',
+      message: `Client ended the stream`,
+      toUser: this.receiverUser,
+    });
   }
 
   setLocalDescription(localDescription) {
@@ -254,6 +271,10 @@ class RTCConnectionClass {
 
   addIceCandidate(candidate) {
     return this.peerConnection.addIceCandidate(candidate);
+  }
+
+  close() {
+    this.peerConnection.close();
   }
 }
 

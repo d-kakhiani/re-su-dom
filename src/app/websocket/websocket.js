@@ -168,7 +168,7 @@ class WebSocket {
         this._sendMessages(users, userId,
             {
               type: 'error',
-              message: 'There is not any active user with id' +
+              message: 'There is not any active user with id ' +
                   messageObject.clientId,
             });
       });
@@ -224,6 +224,22 @@ class WebSocket {
     }
     // can be passed from both side (support <-> client)
     if (messageObject.type === 'candidate') {
+      if (config.redis) {
+        this.redis.publish(config.redis.messageChannel,
+            JSON.stringify({
+              messageObject: {
+                type: 'direct-message',
+                to: messageObject.toUser,
+                msg: messageObject,
+              },
+              userId,
+            }));
+      } else {
+        this._sendMessages(users, messageObject.toUser, messageObject);
+      }
+    }
+
+    if (messageObject.type === 'close' || messageObject.type === 'error') {
       if (config.redis) {
         this.redis.publish(config.redis.messageChannel,
             JSON.stringify({
