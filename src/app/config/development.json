@@ -1,0 +1,19 @@
+{
+  "apiEndpoint": "",
+  "filesEndPoint": "",
+  "redis": {
+    "messageChannel": "test",
+    "host": "127.0.0.1",
+    "post": "6379"
+  },
+  "webSocket": {
+    "pingInterval": 30000
+  },
+  "session": {
+    "secret": "mySecret",
+    "store": "redis",
+    "referrers": []
+  },
+  "logLevel": "info",
+  "secure": true
+}

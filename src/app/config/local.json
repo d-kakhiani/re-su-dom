@@ -1,0 +1,21 @@
+{
+  "apiEndpoint": "",
+  "filesEndPoint": "",
+  "redis":false,
+  "webSocket": {
+    "pingInterval": 30000
+  },
+  "session": {
+    "secret": "mySecret",
+    "store": "memory",
+    "referrers": []
+  },
+  "openID": {
+    "dicovery": "",
+    "redirectUrl": "",
+    "clientId": "",
+    "clientSecret": ""
+  },
+  "logLevel": "none",
+  "secure": false
+}
