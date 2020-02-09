@@ -114,7 +114,7 @@ class WebSocket {
     // Comes from client
     if (messageObject.type === 'waiting') {
       if (config.redis) {
-        this.redis.set(userId, 'WAITING');
+        this.redis.setex(userId, 300, 'WAITING');
       } else {
         memoryRedis.set(userId, 'WAITING');
       }
