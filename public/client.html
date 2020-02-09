@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<script src="dist/app.bundle.js"></script>
+<script src="./RemoteSupport.js"></script>
+<script>
+  window.addEventListener('load', () => {
+    const _rsd_ = new RSD();
+    _rsd_.setupClient();
+  });
+</script>
+</body>
+</html>
