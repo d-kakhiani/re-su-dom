@@ -19,7 +19,7 @@ const sessionOptions = {
   cookie: {},
 };
 let sessionParser = null;
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 if (config.secure) {
   app.set('trust proxy', 1);
@@ -67,11 +67,15 @@ app.use((req, res, next) => {
   next();
 });
 app.use(compression());
-app.use(express.static('public'));
 /* Routes */
 app.get('/support', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/support.html'));
+  res.sendFile(path.join(__dirname, 'public/re-support.html'));
 });
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/client.html'));
+});
+app.use(express.static('public'));
 
 app.get('/login/:room', (req, res) => {
   const id = uuid.v4();
