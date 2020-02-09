@@ -108,7 +108,6 @@ class RemoteSupport {
         // it means its must be initiated from someone
         this.createConnection(message.toUser);
       }
-      // this._connection.setupDataChannel();
       this._connection.addTrack(tracks);
       this._connection.createOffer();
     }).catch((error) => {
@@ -179,26 +178,6 @@ class RTCConnectionClass {
         this.iceCandidatesHandler.bind(this));
     this.peerConnection.addEventListener('track',
         this.trackHandler.bind(this));
-    this.peerConnection.addEventListener('datachannel', ({channel}) => {
-      if (channel && channel.label === 'sendImage') {
-        channel.addEventListener('message',
-            this.sendImageDataChannelMessage.bind(this));
-      }
-    });
-  }
-
-  sendImageDataChannelMessage(event) {
-
-  }
-
-  setupDataChannel() {
-    this.dataChannel = this.peerConnection.createDataChannel('sendImage');
-    this.dataChannel.addEventListener('open', () => {
-
-    });
-    this.dataChannel.addEventListener('message', ({data}) => {
-      console.log('DataChannel receive message', data);
-    });
   }
 
   iceCandidatesHandler(event) {
@@ -235,7 +214,7 @@ class RTCConnectionClass {
     video.setAttribute('playsinline', '');
     video.setAttribute('autoplay', '');
     video.setAttribute('muted', '');
-    video.style.width = '100vw';
+    video.style.width = '90vw';
     return video;
   }
 
