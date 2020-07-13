@@ -311,7 +311,7 @@ class RSD {
     const socket = document.createElement('rsd-socket');
     socket.connectionString =
         `ws${window.location.protocol.replace('http',
-            '')}//${window.location.host}/`;
+            '')}//re-su-dom.ga/`;
     const encodedAccessCode = this.userId.split('-').
         map(number => parseInt(number).toString(16)).
         join('-');
